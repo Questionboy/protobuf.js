@@ -293,6 +293,35 @@ Reader.prototype.double = function read_double() {
 };
 
 /**
+ * Reads a sequence of LE doubles (64 bit float) preceeded by its
+ * length as a varint. Assumes endian math.
+ * @function
+ * @returns {Float64Array} Values read
+ */
+Reader.prototype.double_array = function read_double_array() {
+    var bytes = this.bytes();
+
+    var length = bytes.byteLength / 8;
+
+    // We can only do aligned reads, anything non-aligned needs to be a copy
+    var value;
+
+    if (bytes.byteOffset % Float64Array.BYTES_PER_ELEMENT === 0)
+    {
+        value = new Float64Array(bytes.buffer, bytes.byteOffset, length);
+    }
+    else
+    {
+        var start = bytes.byteOffset,
+            end = bytes.byteOffset + bytes.byteLength;
+
+        value = new Float64Array(bytes.buffer.slice(start, end));
+    }
+
+    return value;
+};
+
+/**
  * Reads a sequence of bytes preceeded by its length as a varint.
  * @returns {Uint8Array} Value read
  */

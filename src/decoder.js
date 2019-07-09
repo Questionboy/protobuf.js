@@ -54,6 +54,9 @@ function decoder(mtype) {
                 ("%s[k]=r.%s()", ref, type);
             }
 
+        // Repeated fields read as typed arrays
+        } else if (field.repeated && type === "double") { gen
+                ("%s=r.double_array()", ref);
         // Repeated fields
         } else if (field.repeated) { gen
 
