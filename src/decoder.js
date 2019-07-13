@@ -16,6 +16,8 @@ function missing(field) {
  */
 function decoder(mtype) {
     /* eslint-disable no-unexpected-multiline */
+    var isLe = util.typedArrayIsLe();
+
     var gen = util.codegen(["r", "l"], mtype.name + "$decode")
     ("if(!(r instanceof Reader))")
         ("r=Reader.create(r)")
@@ -55,13 +57,13 @@ function decoder(mtype) {
             }
 
         // Repeated fields read as typed arrays
-        } else if (field.repeated && type === "float") { gen
+        } else if (isLe && field.repeated && type === "float") { gen
                 ("%s=r.float_array()", ref);
-        } else if (field.repeated && type === "double") { gen
+        } else if (isLe && field.repeated && type === "double") { gen
                 ("%s=r.double_array()", ref);
-        } else if (field.repeated && type === "fixed32") { gen
+        } else if (isLe && field.repeated && type === "fixed32") { gen
                 ("%s=r.fixed32_array()", ref);
-        } else if (field.repeated && type === "sfixed32") { gen
+        } else if (isLe && field.repeated && type === "sfixed32") { gen
                 ("%s=r.sfixed32_array()", ref);
         // Repeated fields
         } else if (field.repeated) { gen

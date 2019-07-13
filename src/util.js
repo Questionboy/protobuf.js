@@ -16,6 +16,18 @@ util.fetch   = require("@protobufjs/fetch");
 util.path    = require("@protobufjs/path");
 
 /**
+ * Determine if the TypedArray's of the platform are little endian
+ * matching the Protobuf convention.
+ * @return {boolean} `true` if reserved, otherwise `false`
+ */
+util.typedArrayIsLe = function typedArrayIsLe()
+{
+     var f32 = new Float32Array([ -0 ]),
+         f8b = new Uint8Array(f32.buffer);
+    return f8b[3] === 128;
+}
+
+/**
  * Node's fs module if available.
  * @type {Object.<string,*>}
  */

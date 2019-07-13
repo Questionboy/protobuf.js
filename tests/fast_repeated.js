@@ -28,6 +28,14 @@ message RepSFixed64 {\
 }\
 ";
 
+// TODO: import this function from util
+function typedArrayIsLe()
+{
+    var f32 = new Float32Array([ -0 ]),
+        f8b = new Uint8Array(f32.buffer);
+    return f8b[3] === 128;
+}
+
 function testTypedArray(test, typeName, typedArray)
 {
     var root = protobuf.parse(proto).root;
@@ -42,10 +50,13 @@ function testTypedArray(test, typeName, typedArray)
 }
 
 tape.test.only("readFixedAsTypedArray", function(test) {
-    testTypedArray(test, 'RepFloat', Float32Array);
-    testTypedArray(test, 'RepDouble', Float64Array);
-    testTypedArray(test, 'RepFixed32', Uint32Array);
-    testTypedArray(test, 'RepSFixed32', Int32Array);
+    if (typedArrayIsLe())
+    {
+        testTypedArray(test, 'RepFloat', Float32Array);
+        testTypedArray(test, 'RepDouble', Float64Array);
+        testTypedArray(test, 'RepFixed32', Uint32Array);
+        testTypedArray(test, 'RepSFixed32', Int32Array);
+    }
 
     // NOTE: we dont' support BigUint64Array because access
     // requires the creation of BitInt's, which are arbitrary
