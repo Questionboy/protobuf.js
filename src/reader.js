@@ -246,6 +246,28 @@ function readFixed64(/* this: Reader */) {
 
 /* eslint-enable no-invalid-this */
 
+function readFixedArray(bytes, arrayType) {
+    var length = bytes.byteLength / arrayType.BYTES_PER_ELEMENT;
+
+    // We can only do aligned reads, anything non-aligned needs to be a copy
+    var value;
+
+    if (bytes.byteOffset % arrayType.BYTES_PER_ELEMENT === 0)
+    {
+        value = new Float64Array(bytes.buffer, bytes.byteOffset, length);
+    }
+    else
+    {
+        var start = bytes.byteOffset,
+            end = bytes.byteOffset + bytes.byteLength;
+
+        value = new arrayType(bytes.buffer.slice(start, end));
+    }
+
+    return value;
+}
+
+
 /**
  * Reads fixed 64 bits.
  * @name Reader#fixed64
@@ -261,6 +283,28 @@ function readFixed64(/* this: Reader */) {
  */
 
 /**
+ * Reads a sequence of fixed 32 bit value as unsigned 32 bit integers,
+ * preceeded by its length as a varint. Assumes TypedArrays are little
+ * endian.
+ * @function
+ * @returns {Uint32Array} Values read
+ */
+Reader.prototype.fixed32_array = function read_float_array() {
+    return readFixedArray(this.bytes(), Uint32Array);
+};
+
+/**
+ * Reads a sequence of fixed 32 bit value as signed 32 bit integers,
+ * preceeded by its length as a varint. Assumes TypedArrays are little
+ * endian.
+ * @function
+ * @returns {Int32Array} Values read
+ */
+Reader.prototype.sfixed32_array = function read_float_array() {
+    return readFixedArray(this.bytes(), Int32Array);
+};
+
+/**
  * Reads a float (32 bit) as a number.
  * @function
  * @returns {number} Value read
@@ -274,6 +318,16 @@ Reader.prototype.float = function read_float() {
     var value = util.float.readFloatLE(this.buf, this.pos);
     this.pos += 4;
     return value;
+};
+
+/**
+ * Reads a sequence of LE floats (32 bit float) preceeded by its
+ * length as a varint. Assumes TypedArrays are little endian.
+ * @function
+ * @returns {Float32Array} Values read
+ */
+Reader.prototype.float_array = function read_float_array() {
+    return readFixedArray(this.bytes(), Float32Array);
 };
 
 /**
@@ -294,31 +348,12 @@ Reader.prototype.double = function read_double() {
 
 /**
  * Reads a sequence of LE doubles (64 bit float) preceeded by its
- * length as a varint. Assumes endian math.
+ * length as a varint. Assumes TypedArrays are little endian.
  * @function
  * @returns {Float64Array} Values read
  */
 Reader.prototype.double_array = function read_double_array() {
-    var bytes = this.bytes();
-
-    var length = bytes.byteLength / 8;
-
-    // We can only do aligned reads, anything non-aligned needs to be a copy
-    var value;
-
-    if (bytes.byteOffset % Float64Array.BYTES_PER_ELEMENT === 0)
-    {
-        value = new Float64Array(bytes.buffer, bytes.byteOffset, length);
-    }
-    else
-    {
-        var start = bytes.byteOffset,
-            end = bytes.byteOffset + bytes.byteLength;
-
-        value = new Float64Array(bytes.buffer.slice(start, end));
-    }
-
-    return value;
+    return readFixedArray(this.bytes(), Float64Array);
 };
 
 /**

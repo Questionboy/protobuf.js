@@ -55,8 +55,14 @@ function decoder(mtype) {
             }
 
         // Repeated fields read as typed arrays
+        } else if (field.repeated && type === "float") { gen
+                ("%s=r.float_array()", ref);
         } else if (field.repeated && type === "double") { gen
                 ("%s=r.double_array()", ref);
+        } else if (field.repeated && type === "fixed32") { gen
+                ("%s=r.fixed32_array()", ref);
+        } else if (field.repeated && type === "sfixed32") { gen
+                ("%s=r.sfixed32_array()", ref);
         // Repeated fields
         } else if (field.repeated) { gen
 
