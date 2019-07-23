@@ -254,7 +254,7 @@ function readFixedArray(bytes, arrayType) {
 
     if (bytes.byteOffset % arrayType.BYTES_PER_ELEMENT === 0)
     {
-        value = new Float64Array(bytes.buffer, bytes.byteOffset, length);
+        value = new arrayType(bytes.buffer, bytes.byteOffset, length);   
     }
     else
     {
